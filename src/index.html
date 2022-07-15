@@ -6,18 +6,98 @@
 		hr {
 			width: 80%;
 			color: #cccccc;
+			clear: both;
+		}
+		br {
+			clear: both;
+		}
+		div {
+			border: 1px solid #cccccc;
+			border-radius: 15px;
+			margin: 5px;
+			padding: 15px;
+			box-sizing: border-box;
+		}
+		#container {
+			/*border: none;*/
+			margin-left: auto;
+			margin-right: auto;
+		}
+		#captured-pieces {
+			width:18%;
+			float:left;
+		}
+		#boardarea {
+			width:61%;
+			float:left;
+			overflow: scroll;
+		}
+		#dicerollarea {
+			width:18%;
+			float:left;
+		}
+		.die {
+			border: 1px solid #cccccc;
+			border-radius: 5px;
+			display:inline-block;
+			padding: 5px;
+			aspect-ratio: 1/1;
+			width: 80px;
+		}
+		.piece {
+			border: none;
+			display:inline-block;
+			padding: 5px;
+			aspect-ratio: 1/1;
+			width: 50px;
+		}
+		td.board_cell {
+			width: 60px;
+			height: 60px;
+			aspect-ratio: 1/1;
+			background-color: #ffcc77;
+			margin: 2px;
+		}
+
+		#rolldice {
+			width:100%;
 		}
 	</style>
-    <script type="text/javascript" src="maingame.js"></script>
+	<script type="text/javascript" src="maingame.js"></script>
 </head>
 <body>
 <h1>GMTK Game Jam 2022</h1>
-    <div id="main"></div>
-	<script type="text/javascript">
-		// TODO
-	</script>
+<br />
+<div id="container">
+	<div id="captured-pieces">
+		<h2>Captured Pieces</h2>
+		<div id="enemy-captures">
+			<h3>Enemy's Captures</h3>
+		</div>
+		<div id="friendly-captures">
+			<h3>Your Captures</h3>
+		</div>
+	</div>
+	<div id="boardarea">
+	</div>
+	<div id="dicerollarea">
+		<h2>Dice</h2>
+		<button type="button" id="rolldice">Roll dice</button> 
+		<br>
+	</div>
+<br/>
+</div>
+<script type="text/javascript">
+	// TODO
+	let d = new Die();
+	document.getElementById('dicerollarea').appendChild(d.domElement);
 
-    <hr/>
+	let b = new Board();
+	document.getElementById('boardarea').appendChild(b.domElement);
+</script>
+
+<br/>
+<hr/>
 <h1>Acknowledgements</h1>
 	<p>Written in HTML/Javascript by Viola Buddy.</p>
 </body>
