@@ -31,6 +31,7 @@ function getOffsetFromMovementRanges(mv) {
 }
 
 
+const DieStates = createEnum(['Ready', 'Highlighted', 'Disabled']);
 class Die {
 	constructor(value=null){
 		if(value===null){
@@ -39,7 +40,7 @@ class Die {
 			this.value = value;
 		}
 
-		this.isDisabled = false;
+		this.dieState = DieStates.Ready;
 
 		this.domElement = document.createElement('div');
 		this.domElement.classList.add('die');
@@ -55,18 +56,32 @@ class Die {
 	}
 
 	disable(){
-		this.isDisabled = true;
+		this.dieState = DieStates.Disabled;
 		this.domElement.onclick = null;
 
-		this.domElement.innerHTML = this.value + ' (used)';
+		this.domElement.textContent = this.value + ' (used)';
 		// this.domElement.appendChild(this.dieImage);
 	}
 
-	enable(fnc){
-		this.isDisabled = false;
-		this.domElement.onclick = fnc;
+	/** no argument (i.e. fnc=null) means keep the fnc the same as whatever it previously was*/
+	enable(fnc=null){
+		this.dieState = DieStates.Ready;
+		if(fnc!==null) {
+			this.domElement.onclick = fnc;
+		}
 		
-		this.domElement.innerHTML = this.value;
+		this.domElement.textContent = this.value;
+		// this.domElement.appendChild(this.dieImage);
+	}
+
+	/** no argument (i.e. fnc=null) means keep the fnc the same as whatever it previously was*/
+	highlight(fnc=null) {
+		this.dieState = DieStates.Highlighted;
+		if(fnc!==null) {
+			this.domElement.onclick = fnc;
+		}
+
+		this.domElement.textContent = this.value + ' (CHOSEN)';
 		// this.domElement.appendChild(this.dieImage);
 	}
 }
@@ -315,8 +330,12 @@ class GameInstance {
 		this.dice.forEach(function(d){
 			d.roll();
 			d.enable(function(clickEvent){
+				// first, cancel any previous dice and tiles
+				thisThis.board.clearAllClickable();
+				thisThis.enableAllHighlightedDice();
+				// then highlight the current die
 				thisThis.chosenDie = d.value;
-				d.disable();
+				d.highlight();
 				thisThis.enableClickablePieces();
 			});
 		});
@@ -326,6 +345,22 @@ class GameInstance {
 	disableAllDice(){
 		this.dice.forEach(function(d){
 			d.disable();
+		});
+	}
+
+	enableAllHighlightedDice(){
+		this.dice.forEach(function(d){
+			if(d.dieState === DieStates.Highlighted){
+				d.enable();
+			}
+		});
+	}
+
+	disableAllHighlightedDice(){
+		this.dice.forEach(function(d){
+			if(d.dieState === DieStates.Highlighted){
+				d.disable();
+			}
 		});
 	}
 
@@ -383,6 +418,7 @@ class GameInstance {
 			this.board.makeClickableTarget(final_coordinate[0], final_coordinate[1], function(clickEvent){
 				thisThis.board.movePieceTo(thisThis.activePiece, final_coordinate, thisThis.checkWin.bind(thisThis));
 				thisThis.board.clearAllClickable();
+				thisThis.disableAllHighlightedDice(); // commit the action by disabling the die
 			});
 		}
 	}
