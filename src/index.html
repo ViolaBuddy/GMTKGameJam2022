@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>GMTK Game Jam 2022</title>
+	<title>Dicechess Arena</title>
 	<style type="text/css">
 		hr {
 			width: 80%;
@@ -39,6 +39,26 @@
 			box-sizing: border-box;
 			width:34%;
 			float:left;
+		}
+		#alertoverlay {
+			/*https://stackoverflow.com/questions/35990304/how-to-position-overlay-fixed-div-to-the-center-with-css*/
+			position:fixed;
+			top:50%;
+			left:50%;
+			transform:translate(-50%, -50%);
+			opacity: .8;
+			z-index: 1000;
+
+			border-radius: 15px;
+			border: 5px solid #cc8844;
+			border-radius: 15px;
+			margin: 5px;
+			padding: 15px;
+			width: 500px;
+			height:300px;
+			color: black;
+			background: #ffeecc;
+			text-align: center;
 		}
 		.die {
 			border: 1px solid #cccccc;
@@ -82,11 +102,12 @@
 		.board_tile.clickable_piece {
 			background-color: cyan;
 		}
+
 	</style>
 	<script type="text/javascript" src="maingame.js"></script>
 </head>
 <body>
-<h1>GMTK Game Jam 2022</h1>
+<h1>Dicechess Arena</h1>
 <br />
 <div id="container">
 	<div id="boardarea">
@@ -96,10 +117,13 @@
 	</div>
 <br/>
 </div>
+<div id="alertoverlay">
+</div>
 <script type="text/javascript">
 	let game = new GameInstance(
 		document.getElementById('boardarea'),
-		document.getElementById('dicerollarea')
+		document.getElementById('dicerollarea'),
+		document.getElementById('alertoverlay')
 		);
 </script>
 
@@ -107,6 +131,6 @@
 <hr/>
 <h1>Acknowledgements</h1>
 	<p>Written in HTML/Javascript by Viola Buddy.</p>
-	<p>This game was written for the GMTK Game Jam 2022, whose theme is "Roll of the Dice." The other main inspiration for this game is of course chess and in particular chess variants, in which people have invented all kinds of new rules, pieces, and restrictions on top of regular chess. If you found my game fun or at least interesting, you may want to search for other chess variants.</p>
+	<p>This game was written for the GMTK Game Jam 2022, whose theme is "Roll of the Dice." The other main inspiration for this game is of course chess and in particular chess variants, in which people have invented all kinds of new rules, pieces, and restrictions on top of regular chess. If you found my game fun or at least interesting, you may want to search for other chess variants; there's a long tradition of them, some more closely resembling chess than others.</p>
 </body>
 </html>

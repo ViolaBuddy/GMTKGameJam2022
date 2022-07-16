@@ -131,9 +131,6 @@ class Board {
 		let thisThis = this; // for scoping
 		let capturedPieceIndex = null;
 		this.pieces[(+piece.playerNumber+1)%2].forEach(function(opposingPiece, i){
-			if(piece.playerNumber === "1"){
-				console.log("checking if we captured enemy piece on " + opposingPiece.row + ", " + opposingPiece.col);
-			}
 			if(opposingPiece.row === destination[0] && opposingPiece.col === destination[1]){
 				thisThis.domElements_tiles[destination[0]][destination[1]].removeChild(opposingPiece.domElement);
 				opposingPiece.row = null;
@@ -144,8 +141,6 @@ class Board {
 		// inelegant way of removing a captured piece only if the above forEach finds something to capture
 		if(capturedPieceIndex !== null){
 			this.pieces[(+piece.playerNumber+1)%2].splice(capturedPieceIndex, 1);
-			console.log("capture!");
-			console.log(this.pieces);
 			checkWinFunction();
 		}
 
@@ -227,23 +222,57 @@ class ActionButton {
 	}
 }
 
+class AlertOverlay {
+	/** the parameter domElement is the empty div that AlertOverlay will populate/use */
+	constructor(domElement){
+		this.domElement = domElement;
+		this.messageTextDomElement = document.createElement('h2');
+		this.domElement.appendChild(this.messageTextDomElement);
+
+		this.domElement.appendChild(document.createElement('br'));
+
+		// formatted as an .actionbutton but not actually an instance of the ActionButton class
+		this.closeButtonDomElement = document.createElement('button');
+		this.closeButtonDomElement.type = 'button';
+		this.closeButtonDomElement.classList.add('actionbutton');
+		this.domElement.appendChild(this.closeButtonDomElement);
+
+		this.hide();
+	}
+
+	alert(message, closeButtonTxt, closeButtonFnc) {
+		this.active = true;
+		this.domElement.style.display = '';
+		this.messageTextDomElement.textContent = message;
+
+		this.closeButtonDomElement.textContent = closeButtonTxt;
+		this.closeButtonDomElement.onclick = closeButtonFnc;
+	}
+
+	hide() {
+		this.active = false;
+		this.domElement.style.display = 'none';
+	}
+}
+
 class GameInstance {
 	static NUM_ROWS = 5;
 	static NUM_COLS = 8;
 	static NUM_DICE = 3;
 
-	static INITIAL_PIECE_POSITIONS = {
-		"0": [[0, 0]],
-		"1": [[0, 7]]
-	};
-
+	// // for testing
 	// static INITIAL_PIECE_POSITIONS = {
-	// 	"0": [[0, 0],[1, 0],[2, 0],[3, 0],[4, 0]],
-	// 	"1": [[0, 7],[1, 7],[2, 7],[3, 7],[4, 7]]
+	// 	'0': [[0, 2]],
+	// 	'1': [[0, 5]]
 	// };
 
+	static INITIAL_PIECE_POSITIONS = {
+		'0': [[0, 0],[1, 0],[2, 0],[3, 0],[4, 0]],
+		'1': [[0, 7],[1, 7],[2, 7],[3, 7],[4, 7]]
+	};
+
 	/** arguments are the divs where this constructor will place the visual elements  */
-	constructor(boardLocation, diceLocation){
+	constructor(boardLocation, diceLocation, alertLocation){
 		this.playerTurn = 0;
 		this.chosenDie = null;
 		this.activePiece = null;
@@ -260,9 +289,11 @@ class GameInstance {
 
 		let thisThis = this; // for scoping
 		this.rollDiceButton = new ActionButton([
-			{'text': 'Roll Dice!', 'fnc': function(clickEvent){thisThis.rollDice();} },
+			// {'text': 'Roll Dice!', 'fnc': function(clickEvent){thisThis.rollDice();} },
+			{'text': '\xa0' /*&nbsp*/ , 'fnc': function(clickEvent){}}, // janky way to disable clicking
 			{'text': 'End Turn!', 'fnc': function(clickEvent){thisThis.changePlayer();} }
 		]);
+		this.rollDiceButton.changeState(1);
 		diceLocation.appendChild(this.rollDiceButton.domElement);
 
 		this.dice = new Array(GameInstance.NUM_DICE);
@@ -270,6 +301,13 @@ class GameInstance {
 			this.dice[i] = new Die();
 			diceLocation.appendChild(this.dice[i].domElement);
 		}
+		this.disableAllDice();
+
+		// set up alert overlay
+		this.alertOverlay = new AlertOverlay(alertLocation);
+
+		// any initial function calls
+		this.changePlayer(0);
 	}
 
 	rollDice() {
@@ -285,14 +323,33 @@ class GameInstance {
 		this.rollDiceButton.changeState();
 	}
 
-	changePlayer(){
+	disableAllDice(){
 		this.dice.forEach(function(d){
 			d.disable();
 		});
-		this.playerTurn = (this.playerTurn+1) % 2; // probably unnecessarily complicated way of swapping between player 0 and 1
+	}
+
+	changePlayer(playerTurn=null){
+		let thisThis = this; // for scoping
+		this.board.clearAllClickable();
+
+		if(playerTurn === null){
+			this.disableAllDice();
+			this.playerTurn = (this.playerTurn+1) % 2; // probably unnecessarily complicated way of swapping between player 0 and 1
+		} else {
+			this.playerTurn = playerTurn;
+		}
 		this.playerTurnText.textContent = 'Player ' + this.playerTurn + '\'s Turn';
 
 		this.rollDiceButton.changeState();
+		this.alertOverlay.alert(
+			'Player ' + this.playerTurn + '\'s Turn',
+			'Roll Dice!',
+			function(clickEvent){
+				thisThis.rollDice();
+				thisThis.alertOverlay.hide();
+			}
+		);
 	}
 
 	enableClickablePieces(){
@@ -333,7 +390,16 @@ class GameInstance {
 	checkWin(){
 		for(const [player, playerpieces] of Object.entries(this.board.pieces)) {
 			if (playerpieces.length === 0){
-				console.log("player " + ((+player+1)%2) + " won!");
+				this.alertOverlay.alert(
+					'Player ' + ((+player+1)%2) + ' won!',
+					'Roll Dice!',
+					function(clickEvent){}
+				);
+				// Disable all the other buttons
+				this.board.clearAllClickable();
+				this.rollDiceButton.changeState(0);
+				this.disableAllDice();
+				this.alertOverlay.closeButtonDomElement.disabled = true;
 			}
 		}
 	}
