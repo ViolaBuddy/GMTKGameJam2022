@@ -23,17 +23,13 @@
 			margin-left: auto;
 			margin-right: auto;
 		}
-		#captured-pieces {
-			width:18%;
-			float:left;
-		}
 		#boardarea {
 			width:61%;
 			float:left;
 			overflow: scroll;
 		}
 		#dicerollarea {
-			width:18%;
+			width:34%;
 			float:left;
 		}
 		.die {
@@ -45,21 +41,25 @@
 			width: 80px;
 		}
 		.piece {
-			border: none;
+			border: 1 px solid gray;
 			display:inline-block;
 			padding: 5px;
 			aspect-ratio: 1/1;
-			width: 50px;
 		}
-		td.board_cell {
-			width: 60px;
-			height: 60px;
+		.board_table {
+			display: grid;
+		}
+		.board_tile {
+			border: none ;
+			border-radius: 5px;
+			padding: 5px;
+			
 			aspect-ratio: 1/1;
+			width: 96px;
 			background-color: #ffcc77;
-			margin: 2px;
 		}
 
-		#rolldice {
+		.actionbutton {
 			width:100%;
 		}
 	</style>
@@ -69,36 +69,24 @@
 <h1>GMTK Game Jam 2022</h1>
 <br />
 <div id="container">
-	<div id="captured-pieces">
-		<h2>Captured Pieces</h2>
-		<div id="enemy-captures">
-			<h3>Enemy's Captures</h3>
-		</div>
-		<div id="friendly-captures">
-			<h3>Your Captures</h3>
-		</div>
-	</div>
 	<div id="boardarea">
 	</div>
 	<div id="dicerollarea">
 		<h2>Dice</h2>
-		<button type="button" id="rolldice">Roll dice</button> 
-		<br>
 	</div>
 <br/>
 </div>
 <script type="text/javascript">
-	// TODO
-	let d = new Die();
-	document.getElementById('dicerollarea').appendChild(d.domElement);
-
-	let b = new Board();
-	document.getElementById('boardarea').appendChild(b.domElement);
+	let game = new GameInstance(
+		document.getElementById('boardarea'),
+		document.getElementById('dicerollarea')
+		);
 </script>
 
 <br/>
 <hr/>
 <h1>Acknowledgements</h1>
 	<p>Written in HTML/Javascript by Viola Buddy.</p>
+	<p>This game was written for the GMTK Game Jam 2022, whose theme is "Roll of the Dice." Other inspirations include the family of chess variants that use dice to determine which chess piece you are allowed to move.</p>
 </body>
 </html>
