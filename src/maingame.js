@@ -10,21 +10,41 @@ function createEnum(values) {
 	return Object.freeze(enumObject);
 }
 
-const MovementRanges = createEnum(['King', 'Ferz', 'Wazir', 'Alfil', 'Dabbaaba', 'Knight']);
+const MovementRanges = createEnum(['Ferz', 'Wazir', 'Alfil', 'Dabbaaba', 'HKnight', 'VKnight']);
+function getOffsetFromMovementRanges(mv) {
+	switch(mv){
+		case MovementRanges.Ferz:
+			return [[1,1],[1,-1],[-1,1],[-1,-1]];
+		case MovementRanges.Wazir:
+			return [[1,0],[-1,0],[0,1],[0,-1]];
+		case MovementRanges.Alfil:
+			return [[2,2],[2,-2],[-2,2],[-2,-2]];
+		case MovementRanges.Dabbaaba:
+			return [[2,0],[-2,0],[0,2],[0,-2]];
+		case MovementRanges.HKnight:
+			return [[1,2],[1,-2],[-1,2],[-1,-2]];
+		case MovementRanges.VKnight:
+			return [[2,1],[2,-1],[-2,1],[-2,-1]];
+		default:
+			return null;
+	}
+}
+
 
 class Die {
 	constructor(value=null){
 		if(value===null){
-			this.value = MovementRanges.King;
+			this.value = MovementRanges[0];
 		} else {
 			this.value = value;
 		}
 
+		this.isDisabled = false;
+
 		this.domElement = document.createElement('div');
-		// this.dieImage = document.createTextNode(this.value);
+		this.domElement.classList.add('die');
 		this.domElement.innerHTML = this.value;
 		// this.domElement.appendChild(this.dieImage);
-		this.domElement.classList.add('die');
 	}
 
 	roll(){
@@ -32,6 +52,22 @@ class Die {
 		this.value = MovementRanges[newValueIndex];
 		// this.dieImage.textContent = this.value;
 		this.domElement.innerHTML = this.value;
+	}
+
+	disable(){
+		this.isDisabled = true;
+		this.domElement.onclick = null;
+
+		this.domElement.innerHTML = this.value + ' (used)';
+		// this.domElement.appendChild(this.dieImage);
+	}
+
+	enable(fnc){
+		this.isDisabled = false;
+		this.domElement.onclick = fnc;
+		
+		this.domElement.innerHTML = this.value;
+		// this.domElement.appendChild(this.dieImage);
 	}
 }
 
@@ -43,7 +79,7 @@ class Piece {
 
 		this.domElement = document.createElement('div');
 		// this.dieImage = document.createTextNode(this.value);
-		this.domElement.innerHTML = "Player " + playerNumber + "'s piece";
+		this.domElement.innerHTML = "Player " + this.playerNumber + "'s piece";
 		// this.domElement.appendChild(this.dieImage);
 		this.domElement.classList.add('piece');
 	}
@@ -88,6 +124,79 @@ class Board {
 			}
 		}
 	}
+
+	/** piece is a Piece that is already in this.pieces, destination is [y, x] */
+	movePieceTo(piece, destination, checkWinFunction){
+		// handle captures, if any
+		let thisThis = this; // for scoping
+		let capturedPieceIndex = null;
+		this.pieces[(+piece.playerNumber+1)%2].forEach(function(opposingPiece, i){
+			if(piece.playerNumber === "1"){
+				console.log("checking if we captured enemy piece on " + opposingPiece.row + ", " + opposingPiece.col);
+			}
+			if(opposingPiece.row === destination[0] && opposingPiece.col === destination[1]){
+				thisThis.domElements_tiles[destination[0]][destination[1]].removeChild(opposingPiece.domElement);
+				opposingPiece.row = null;
+				opposingPiece.col = null;
+				capturedPieceIndex = i;
+			}
+		});
+		// inelegant way of removing a captured piece only if the above forEach finds something to capture
+		if(capturedPieceIndex !== null){
+			this.pieces[(+piece.playerNumber+1)%2].splice(capturedPieceIndex, 1);
+			console.log("capture!");
+			console.log(this.pieces);
+			checkWinFunction();
+		}
+
+		// then actually move the current piece
+		this.domElements_tiles[destination[0]][destination[1]].appendChild(piece.domElement);
+		piece.row = destination[0];
+		piece.col = destination[1];
+	}
+
+	/** make this tile clickable */
+	makeClickablePiece(row, col, fnc) {
+		this.domElements_tiles[row][col].classList.add('clickable_piece');
+		this.domElements_tiles[row][col].onclick = fnc;
+	}
+
+	/** make this target clickable */
+	makeClickableTarget(row, col, fnc) {
+		this.domElements_tiles[row][col].classList.add('clickable_target');
+		this.domElements_tiles[row][col].onclick = fnc;
+	}
+
+	/** make this target no longer clickable */
+	clearClickable(row, col) {
+		this.domElements_tiles[row][col].classList.remove('clickable_piece');
+		this.domElements_tiles[row][col].classList.remove('clickable_target');
+		this.domElements_tiles[row][col].onclick = null;
+	}
+
+	/** make everything no longer clickable except for this tile */
+	clearAllClickableExcept(row, col) {
+		// set up board tiles
+		for (let y = 0; y < this.numRows; y++) {
+			for (let x = 0; x < this.numCols; x++) {
+				if (row === y && col === x){
+					// do nothing
+				} else{
+					this.clearClickable(y, x);
+				}
+			}
+		}
+	}
+
+	/** make everything no longer clickable */
+	clearAllClickable() {
+		// set up board tiles
+		for (let y = 0; y < this.numRows; y++) {
+			for (let x = 0; x < this.numCols; x++) {
+				this.clearClickable(y, x);
+			}
+		}
+	}
 }
 
 class ActionButton {
@@ -119,17 +228,25 @@ class ActionButton {
 }
 
 class GameInstance {
-	static NUM_ROWS = 6;
-	static NUM_COLS = 9;
+	static NUM_ROWS = 5;
+	static NUM_COLS = 8;
 	static NUM_DICE = 3;
+
 	static INITIAL_PIECE_POSITIONS = {
-		"0": [[0, 0],[1, 0],[2, 0],[3, 0],[4, 0],[5, 0]],
-		"1": [[0, 8],[1, 8],[2, 8],[3, 8],[4, 8],[5, 8]]
+		"0": [[0, 0]],
+		"1": [[0, 7]]
 	};
 
+	// static INITIAL_PIECE_POSITIONS = {
+	// 	"0": [[0, 0],[1, 0],[2, 0],[3, 0],[4, 0]],
+	// 	"1": [[0, 7],[1, 7],[2, 7],[3, 7],[4, 7]]
+	// };
+
 	/** arguments are the divs where this constructor will place the visual elements  */
-	constructor(boardLocation, diceLocation, captureLocation){
+	constructor(boardLocation, diceLocation){
 		this.playerTurn = 0;
+		this.chosenDie = null;
+		this.activePiece = null;
 
 		// set up board
 		this.board = new Board(GameInstance.NUM_ROWS, GameInstance.NUM_COLS, GameInstance.INITIAL_PIECE_POSITIONS);
@@ -156,16 +273,68 @@ class GameInstance {
 	}
 
 	rollDice() {
+		let thisThis = this; // for scoping
 		this.dice.forEach(function(d){
 			d.roll();
+			d.enable(function(clickEvent){
+				thisThis.chosenDie = d.value;
+				d.disable();
+				thisThis.enableClickablePieces();
+			});
 		});
 		this.rollDiceButton.changeState();
 	}
 
 	changePlayer(){
+		this.dice.forEach(function(d){
+			d.disable();
+		});
 		this.playerTurn = (this.playerTurn+1) % 2; // probably unnecessarily complicated way of swapping between player 0 and 1
 		this.playerTurnText.textContent = 'Player ' + this.playerTurn + '\'s Turn';
 
 		this.rollDiceButton.changeState();
+	}
+
+	enableClickablePieces(){
+		let thisThis = this; // for scoping
+		for(let piece of this.board.pieces[this.playerTurn]){
+			this.board.makeClickablePiece(piece.row, piece.col, function(clickEvent){
+				thisThis.board.clearAllClickableExcept(piece.row, piece.col);
+				thisThis.activePiece = piece;
+				thisThis.enableClickableTargets();
+			})
+		}
+	}
+
+	/** this.chosenDie and this.activePiece must not be null */
+	enableClickableTargets(){
+		let offsets = getOffsetFromMovementRanges(this.chosenDie);
+		let final_coordinates = offsets.map(offset =>
+			[offset[0]+this.activePiece.row, offset[1] + this.activePiece.col]
+		).filter(coordinates =>
+			// make sure we're not off the edge of the map...
+			coordinates[0] >= 0 && coordinates[0]< GameInstance.NUM_ROWS &&
+			coordinates[1] >= 0 && coordinates[1]< GameInstance.NUM_COLS &&
+			// ...and also that none of the friendly pieces are in the way
+			this.board.pieces[this.playerTurn].every(friendlyPiece =>
+				!(coordinates[0]===friendlyPiece.row && coordinates[1]===friendlyPiece.col)
+			)
+		);
+
+		let thisThis = this; // for scoping
+		for(let final_coordinate of final_coordinates) {
+			this.board.makeClickableTarget(final_coordinate[0], final_coordinate[1], function(clickEvent){
+				thisThis.board.movePieceTo(thisThis.activePiece, final_coordinate, thisThis.checkWin.bind(thisThis));
+				thisThis.board.clearAllClickable();
+			});
+		}
+	}
+
+	checkWin(){
+		for(const [player, playerpieces] of Object.entries(this.board.pieces)) {
+			if (playerpieces.length === 0){
+				console.log("player " + ((+player+1)%2) + " won!");
+			}
+		}
 	}
 }

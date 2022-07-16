@@ -11,32 +11,42 @@
 		br {
 			clear: both;
 		}
-		div {
+		#container {
 			border: 1px solid #cccccc;
 			border-radius: 15px;
 			margin: 5px;
 			padding: 15px;
 			box-sizing: border-box;
-		}
-		#container {
 			/*border: none;*/
 			margin-left: auto;
 			margin-right: auto;
 		}
 		#boardarea {
+			border: 1px solid #cccccc;
+			border-radius: 15px;
+			margin: 5px;
+			padding: 15px;
+			box-sizing: border-box;
 			width:61%;
 			float:left;
 			overflow: scroll;
 		}
 		#dicerollarea {
+			border: 1px solid #cccccc;
+			border-radius: 15px;
+			margin: 5px;
+			padding: 15px;
+			box-sizing: border-box;
 			width:34%;
 			float:left;
 		}
 		.die {
 			border: 1px solid #cccccc;
-			border-radius: 5px;
+			border-radius: 30px;
+			padding: 30px;
+			margin: 5px;
 			display:inline-block;
-			padding: 5px;
+			float: left;
 			aspect-ratio: 1/1;
 			width: 80px;
 		}
@@ -48,6 +58,8 @@
 		}
 		.board_table {
 			display: grid;
+  			column-gap: 10px;
+  			row-gap: 10px
 		}
 		.board_tile {
 			border: none ;
@@ -61,6 +73,14 @@
 
 		.actionbutton {
 			width:100%;
+		}
+
+		.board_tile.clickable_target {
+			background-color: red;
+		}
+
+		.board_tile.clickable_piece {
+			background-color: cyan;
 		}
 	</style>
 	<script type="text/javascript" src="maingame.js"></script>
@@ -87,6 +107,6 @@
 <hr/>
 <h1>Acknowledgements</h1>
 	<p>Written in HTML/Javascript by Viola Buddy.</p>
-	<p>This game was written for the GMTK Game Jam 2022, whose theme is "Roll of the Dice." Other inspirations include the family of chess variants that use dice to determine which chess piece you are allowed to move.</p>
+	<p>This game was written for the GMTK Game Jam 2022, whose theme is "Roll of the Dice." The other main inspiration for this game is of course chess and in particular chess variants, in which people have invented all kinds of new rules, pieces, and restrictions on top of regular chess. If you found my game fun or at least interesting, you may want to search for other chess variants.</p>
 </body>
 </html>
