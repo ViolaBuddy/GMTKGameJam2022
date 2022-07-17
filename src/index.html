@@ -5,6 +5,7 @@
 	<style type="text/css">
 		body {
 			background-color: #D29460;
+			font-family: 'Trebuchet MS', Helvetica, sans-serif;
 		}
 		hr {
 			width: 80%;
@@ -14,114 +15,61 @@
 		br {
 			clear: both;
 		}
-		#boardarea, #dicerollarea, #alertoverlay {
-			border: 3px solid #743f39;
-			border-radius: 15px;
-			margin: 5px;
-			padding: 15px;
-			box-sizing: border-box;
+		h1 {
+			font-size: 2.5em;
 		}
-		#boardarea {
-			width:61%;
-			float:left;
-			overflow: scroll;
+		h2 {
+			font-size: 2em;
 		}
-		#dicerollarea {
-			width:34%;
-			float:left;
+		a {
+			color: #660000;
 		}
-		#alertoverlay {
-			/*https://stackoverflow.com/questions/35990304/how-to-position-overlay-fixed-div-to-the-center-with-css*/
-			position:fixed;
-			top:50%;
-			left:50%;
-			transform:translate(-50%, -50%);
-			opacity: .8;
-			z-index: 1000;
-
-			width: 500px;
-			height:300px;
-			background: #ffeecc;
-			text-align: center;
-		}
-		.die {
-			border-radius: 30px;
-			background-color: #fffaf0;
-			margin: 5px;
-			padding: 9px;
-
-			display:inline-block;
-			float: left;
-			aspect-ratio: 1/1;
-			width: 110px;
-			cursor: pointer;
-			user-select: none;
-		}
-		.die.highlighted {
-			background-color: #aaeeff;
-			cursor: pointer;
-		}
-		.die.disabled {
-			background-color: #888888;
-			cursor: default;
-		}
-		.piece {
-			display:inline-block;
-			aspect-ratio: 1/1;
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%)
-		}
-		.piece img{
-			width: 64px;
-		}
-		.board_table {
-			display: grid;
-			text-align: center;
-  			column-gap: 1px;
-  			row-gap: 1px;
-		}
-		.board_tile {
-			border: 4px solid white;
-			border-radius: 5px;
-			padding: 5px;
-			box-sizing: border-box;
-			cursor: default;
-			user-select: none;
-			position: relative;
-			
-			aspect-ratio: 1/1;
-			width: 96px;
-			background-color: #ffcc77;
-		}
-		.actionbutton {
-			width:100%;
-		}
-		.board_tile.clickable_target {
-			background-color: #ee7744;
-			cursor: pointer;
-		}
-		.board_tile.clickable_piece {
-			background-color: #aaeeff;
-			cursor: pointer;
+		#movementdiagrams>img{
+			width:15%;
+			max-width: 500px;
+			margin-right:1%;
 		}
 	</style>
+	<link rel="stylesheet" href="game.css">
 	<script type="text/javascript" src="maingame.js"></script>
 </head>
 <body>
 <h1>Dicechess Arena</h1>
+<div id="instructions">
+	<p>In this two-player game, <strong>the goal is to capture all of your opponent's pieces</strong>. Like in chess, the way you capture a piece is by moving your own piece onto its square. But unlike in chess, the way these pieces move is determined by <em>a roll of the dice</em>.</p>
+	<p>We have special six-sided dice with a different possible move on each face. At the start of your turn, you roll three of these dice. For each of these dice, you can choose to move any one of your pieces. First click on the die you wish to use, then click on the piece you wish to move, then the destination square. You can use these dice in any order, and you are not required to use all of them before you finish your turn.</p>
+	<p>The six possible moves are: 
+	<button type="button" id="toggleinstructions">Show/Hide movement diagrams</button></p>
+	<div id="movementdiagrams">
+		<img src="img/instructions_ferz.png" alt="Ferz movement diagram">
+		<img src="img/instructions_alfil.png" alt="Alfil movement diagram">
+		<img src="img/instructions_wazir.png" alt="Wazir movement diagram">
+		<img src="img/instructions_dabbaaba.png" alt="Dabbaaba movement diagram">
+		<img src="img/instructions_hknight.png" alt="HKnight movement diagram">
+		<img src="img/instructions_vknight.png" alt="VKnight movement diagram">
+	</div>
+</div>
 <div id="container">
 	<div id="boardarea">
 	</div>
 	<div id="dicerollarea">
-		<h2>Dice</h2>
 	</div>
 <br/>
 </div>
 <div id="alertoverlay">
 </div>
 <script type="text/javascript">
+	let movementDiagrams = document.getElementById('movementdiagrams');
+	movementDiagrams.style.display = 'none';
+
+	document.getElementById('toggleinstructions').onclick = function(clickEvent){
+		if(movementDiagrams.style.display === 'none'){
+			movementDiagrams.style.display = 'block';
+		} else{
+			movementDiagrams.style.display = 'none';
+		}
+	}
+
 	let game = new GameInstance(
 		document.getElementById('boardarea'),
 		document.getElementById('dicerollarea'),
@@ -131,10 +79,12 @@
 
 <br/>
 <hr/>
-<h1>Acknowledgements</h1>
+<div id="acknowledgements">
+	<h1>Acknowledgements</h1>
 	<p>Written in HTML/Javascript by Viola Buddy.</p>
-	<p>This game was written for the GMTK Game Jam 2022, whose theme is "Roll of the Dice." The other main inspiration for this game is of course chess and in particular chess variants, in which people have invented all kinds of new rules, pieces, and restrictions on top of regular chess. If you found my game fun or at least interesting, you may want to search for other chess variants; there's a long tradition of them, some more closely resembling chess than others.</p>
+	<p>This game was created for the GMTK Game Jam 2022, whose theme is "Roll of the Dice." The other main inspiration for this game is of course chess and in particular chess variants, in which people have invented all kinds of new rules, pieces, and restrictions on top of regular chess. If you found my game fun or at least interesting, you may want to search for other chess variants; there's a long tradition of them, some more closely resembling chess than others. All six moves in this game have established names in chess variants (ferz, alfil, wazir, dabbaaba, narrow knight, and wide knight).</p>
 	<p>Rook, bishop, and knight icons are by Skoll and are taken from <a href="https://www.game-icons.net">game-icons.net</a> under the CC BY license. Player pieces and modifications to the chess icons are by Viola Buddy.</p>
+</div>
 </body>
 </html>
 <!-- The way all the pieces move is determined by a roll of the dice -->

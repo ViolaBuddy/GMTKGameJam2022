@@ -318,18 +318,18 @@ class GameInstance {
 		boardLocation.appendChild(this.board.domElement);
 
 		// set up dice sidebar
-		this.playerTurnText = document.createElement('div');
+		this.playerTurnText = document.createElement('h2');
 		this.playerTurnText.style.textAlign = 'center';
-		this.playerTurnText.textContent = PLAYER_NAMES[+this.playerTurn] + '\'s Turn';
+		this.playerTurnText.textContent = 'Press button to start game';
 		diceLocation.appendChild(this.playerTurnText);
 
 		let thisThis = this; // for scoping
 		this.rollDiceButton = new ActionButton([
-			// {'text': 'Roll Dice!', 'fnc': function(clickEvent){thisThis.rollDice();} },
+			{'text': 'Start Game!', 'fnc': function(clickEvent){thisThis.startGame();} },
 			{'text': '\xa0' /*&nbsp*/ , 'fnc': function(clickEvent){}}, // janky way to disable clicking
-			{'text': 'End Turn!', 'fnc': function(clickEvent){thisThis.changePlayer();} }
+			{'text': 'End Turn', 'fnc': function(clickEvent){thisThis.changePlayer();} }
 		]);
-		this.rollDiceButton.changeState(1);
+		this.rollDiceButton.changeState(0);
 		diceLocation.appendChild(this.rollDiceButton.domElement);
 
 		this.dice = new Array(GameInstance.NUM_DICE);
@@ -341,7 +341,10 @@ class GameInstance {
 
 		// set up alert overlay
 		this.alertOverlay = new AlertOverlay(alertLocation);
+		this.alertOverlay.hide();
+	}
 
+	startGame() {
 		// any initial function calls
 		this.changePlayer(0);
 	}
@@ -360,7 +363,7 @@ class GameInstance {
 				thisThis.enableClickablePieces();
 			});
 		});
-		this.rollDiceButton.changeState();
+		this.rollDiceButton.changeState(2);
 	}
 
 	disableAllDice(){
@@ -397,7 +400,7 @@ class GameInstance {
 		}
 		this.playerTurnText.textContent = PLAYER_NAMES[+this.playerTurn] + '\'s Turn';
 
-		this.rollDiceButton.changeState();
+		this.rollDiceButton.changeState(1);
 		this.alertOverlay.alert(
 			PLAYER_NAMES[+this.playerTurn] + '\'s Turn',
 			'Roll Dice!',
@@ -448,13 +451,13 @@ class GameInstance {
 		for(const [player, playerpieces] of Object.entries(this.board.pieces)) {
 			if (playerpieces.length === 0){
 				this.alertOverlay.alert(
-					'Player ' + ((+player+1)%2) + ' won!',
+					PLAYER_NAMES[(+player+1)%2] + ' won!',
 					'Roll Dice!',
 					function(clickEvent){}
 				);
 				// Disable all the other buttons
 				this.board.clearAllClickable();
-				this.rollDiceButton.changeState(0);
+				this.rollDiceButton.changeState(1);
 				this.disableAllDice();
 				this.alertOverlay.closeButtonDomElement.disabled = true;
 			}
