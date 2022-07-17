@@ -10,6 +10,8 @@ function createEnum(values) {
 	return Object.freeze(enumObject);
 }
 
+const PLAYER_NAMES = ['Red Player', 'Blue Player'];
+
 const MovementRanges = createEnum(['Ferz', 'Wazir', 'Alfil', 'Dabbaaba', 'HKnight', 'VKnight']);
 function getOffsetFromMovementRanges(mv) {
 	switch(mv){
@@ -44,22 +46,30 @@ class Die {
 
 		this.domElement = document.createElement('div');
 		this.domElement.classList.add('die');
-		this.domElement.innerHTML = this.value;
-		// this.domElement.appendChild(this.dieImage);
+		// this.domElement.innerHTML = this.value;
+
+		this.dieImage = document.createElement('img');
+		this.domElement.appendChild(this.dieImage);
+		this.updateImage();
+
+		this.enable();
 	}
 
 	roll(){
 		let newValueIndex = Math.floor(Math.random() * MovementRanges.length);
 		this.value = MovementRanges[newValueIndex];
 		// this.dieImage.textContent = this.value;
-		this.domElement.innerHTML = this.value;
+
+		this.updateImage();
 	}
 
 	disable(){
 		this.dieState = DieStates.Disabled;
 		this.domElement.onclick = null;
+		this.domElement.classList.remove('highlighted');
+		this.domElement.classList.add('disabled');
 
-		this.domElement.textContent = this.value + ' (used)';
+		this.updateImage();
 		// this.domElement.appendChild(this.dieImage);
 	}
 
@@ -69,9 +79,10 @@ class Die {
 		if(fnc!==null) {
 			this.domElement.onclick = fnc;
 		}
+		this.domElement.classList.remove('highlighted');
+		this.domElement.classList.remove('disabled');
 		
-		this.domElement.textContent = this.value;
-		// this.domElement.appendChild(this.dieImage);
+		this.updateImage();
 	}
 
 	/** no argument (i.e. fnc=null) means keep the fnc the same as whatever it previously was*/
@@ -80,9 +91,15 @@ class Die {
 		if(fnc!==null) {
 			this.domElement.onclick = fnc;
 		}
+		this.domElement.classList.add('highlighted');
+		this.domElement.classList.remove('disabled');
 
-		this.domElement.textContent = this.value + ' (CHOSEN)';
-		// this.domElement.appendChild(this.dieImage);
+		this.updateImage();
+	}
+
+	updateImage(){
+		this.dieImage.src = 'img/'+this.value+'.svg';
+		this.dieImage.alt = this.value;
 	}
 }
 
@@ -93,9 +110,13 @@ class Piece {
 		this.col = null;
 
 		this.domElement = document.createElement('div');
-		// this.dieImage = document.createTextNode(this.value);
-		this.domElement.innerHTML = "Player " + this.playerNumber + "'s piece";
-		// this.domElement.appendChild(this.dieImage);
+
+		this.pieceImg = document.createElement('img');
+		this.pieceImg.src = 'img/player'+this.playerNumber+'.svg';
+		this.pieceImg.alt = PLAYER_NAMES[+this.playerNumber] + '\'s piece';
+		this.domElement.appendChild(this.pieceImg);
+
+		// this.domElement.innerHTML = 'Player ' + this.playerNumber + '\'s piece';
 		this.domElement.classList.add('piece');
 	}
 }
@@ -108,8 +129,8 @@ class Board {
 		this.domElements_tiles = new Array(this.numRows);
 		this.domElement = document.createElement('div')
 		this.domElement.classList.add('board_table');
-		this.domElement.style.gridTemplateColumns = 'repeat('+this.numCols+', 100px [col-start])';
-		this.domElement.style.gridTemplateRows = 'repeat('+this.numRows+', 100px [col-start])';
+		this.domElement.style.gridTemplateColumns = 'repeat('+this.numCols+', 88px [col-start])';
+		this.domElement.style.gridTemplateRows = 'repeat('+this.numRows+', 88px [col-start])';
 		
 		// set up board tiles
 		for (let y = 0; y < this.numRows; y++) {
@@ -299,7 +320,7 @@ class GameInstance {
 		// set up dice sidebar
 		this.playerTurnText = document.createElement('div');
 		this.playerTurnText.style.textAlign = 'center';
-		this.playerTurnText.textContent = 'Player ' + this.playerTurn + '\'s Turn';
+		this.playerTurnText.textContent = PLAYER_NAMES[+this.playerTurn] + '\'s Turn';
 		diceLocation.appendChild(this.playerTurnText);
 
 		let thisThis = this; // for scoping
@@ -374,11 +395,11 @@ class GameInstance {
 		} else {
 			this.playerTurn = playerTurn;
 		}
-		this.playerTurnText.textContent = 'Player ' + this.playerTurn + '\'s Turn';
+		this.playerTurnText.textContent = PLAYER_NAMES[+this.playerTurn] + '\'s Turn';
 
 		this.rollDiceButton.changeState();
 		this.alertOverlay.alert(
-			'Player ' + this.playerTurn + '\'s Turn',
+			PLAYER_NAMES[+this.playerTurn] + '\'s Turn',
 			'Roll Dice!',
 			function(clickEvent){
 				thisThis.rollDice();
@@ -440,3 +461,4 @@ class GameInstance {
 		}
 	}
 }
+// D29460

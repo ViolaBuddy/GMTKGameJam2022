@@ -3,40 +3,30 @@
 <head>
 	<title>Dicechess Arena</title>
 	<style type="text/css">
+		body {
+			background-color: #D29460;
+		}
 		hr {
 			width: 80%;
-			color: #cccccc;
+			color: #743f39;
 			clear: both;
 		}
 		br {
 			clear: both;
 		}
-		#container {
-			border: 1px solid #cccccc;
+		#boardarea, #dicerollarea, #alertoverlay {
+			border: 3px solid #743f39;
 			border-radius: 15px;
 			margin: 5px;
 			padding: 15px;
 			box-sizing: border-box;
-			/*border: none;*/
-			margin-left: auto;
-			margin-right: auto;
 		}
 		#boardarea {
-			border: 1px solid #cccccc;
-			border-radius: 15px;
-			margin: 5px;
-			padding: 15px;
-			box-sizing: border-box;
 			width:61%;
 			float:left;
 			overflow: scroll;
 		}
 		#dicerollarea {
-			border: 1px solid #cccccc;
-			border-radius: 15px;
-			margin: 5px;
-			padding: 15px;
-			box-sizing: border-box;
 			width:34%;
 			float:left;
 		}
@@ -49,66 +39,78 @@
 			opacity: .8;
 			z-index: 1000;
 
-			border-radius: 15px;
-			border: 5px solid #cc8844;
-			border-radius: 15px;
-			margin: 5px;
-			padding: 15px;
 			width: 500px;
 			height:300px;
-			color: black;
 			background: #ffeecc;
 			text-align: center;
 		}
 		.die {
-			border: 1px solid #cccccc;
 			border-radius: 30px;
-			padding: 30px;
+			background-color: #fffaf0;
 			margin: 5px;
+			padding: 9px;
+
 			display:inline-block;
 			float: left;
 			aspect-ratio: 1/1;
-			width: 80px;
+			width: 110px;
+			cursor: pointer;
+			user-select: none;
+		}
+		.die.highlighted {
+			background-color: #aaeeff;
+			cursor: pointer;
+		}
+		.die.disabled {
+			background-color: #888888;
+			cursor: default;
 		}
 		.piece {
-			border: 1 px solid gray;
 			display:inline-block;
-			padding: 5px;
 			aspect-ratio: 1/1;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%)
+		}
+		.piece img{
+			width: 64px;
 		}
 		.board_table {
 			display: grid;
-  			column-gap: 10px;
-  			row-gap: 10px
+			text-align: center;
+  			column-gap: 1px;
+  			row-gap: 1px;
 		}
 		.board_tile {
-			border: none ;
+			border: 4px solid white;
 			border-radius: 5px;
 			padding: 5px;
+			box-sizing: border-box;
+			cursor: default;
+			user-select: none;
+			position: relative;
 			
 			aspect-ratio: 1/1;
 			width: 96px;
 			background-color: #ffcc77;
 		}
-
 		.actionbutton {
 			width:100%;
 		}
-
 		.board_tile.clickable_target {
-			background-color: red;
+			background-color: #ee7744;
+			cursor: pointer;
 		}
-
 		.board_tile.clickable_piece {
-			background-color: cyan;
+			background-color: #aaeeff;
+			cursor: pointer;
 		}
-
 	</style>
 	<script type="text/javascript" src="maingame.js"></script>
 </head>
 <body>
 <h1>Dicechess Arena</h1>
-<br />
 <div id="container">
 	<div id="boardarea">
 	</div>
@@ -132,5 +134,7 @@
 <h1>Acknowledgements</h1>
 	<p>Written in HTML/Javascript by Viola Buddy.</p>
 	<p>This game was written for the GMTK Game Jam 2022, whose theme is "Roll of the Dice." The other main inspiration for this game is of course chess and in particular chess variants, in which people have invented all kinds of new rules, pieces, and restrictions on top of regular chess. If you found my game fun or at least interesting, you may want to search for other chess variants; there's a long tradition of them, some more closely resembling chess than others.</p>
+	<p>Rook, bishop, and knight icons are by Skoll and are taken from <a href="https://www.game-icons.net">game-icons.net</a> under the CC BY license. Player pieces and modifications to the chess icons are by Viola Buddy.</p>
 </body>
 </html>
+<!-- The way all the pieces move is determined by a roll of the dice -->

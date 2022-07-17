@@ -1,0 +1,27 @@
+<svg style="height: 1024px; width: 1024px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+	<!--the part from game-icons.net-->
+	<g transform="scale(0.50,0.50) translate(256,224)">
+		<path d="M406 484.7H106v-60h300v60zm-56.67-330.83h-50.05V91.3h-82.39v62.57h-54.22V91.3h-54.23v113.67h295.12V91.3h-54.23v62.57zm23.35 67.23H139.32v187.6h233.36V221.1z" fill="#000000" fill-opacity="1"></path>
+	</g>
+	<!--my additions-->
+	<circle cx="256" cy="40" r="24" fill="#000000" />
+	<g transform="translate(256,110) rotate(45)">
+		<polygon points="7,7 35,7 35,-7 7,-7 7,-35 -7,-35 -7,-7
+			-35,-7 -35,7 -7,7 -7,35 7,35" fill="#666666" />
+	</g>
+	<circle cx="256" cy="472" r="24" fill="#000000" />
+	<g transform="translate(256,402) rotate(45)">
+		<polygon points="7,7 35,7 35,-7 7,-7 7,-35 -7,-35 -7,-7
+			-35,-7 -35,7 -7,7 -7,35 7,35" fill="#666666" />
+	</g>
+	<circle cx="40" cy="256" r="24" fill="#000000" />
+	<g transform="translate(110,256) rotate(45)">
+		<polygon points="7,7 35,7 35,-7 7,-7 7,-35 -7,-35 -7,-7
+			-35,-7 -35,7 -7,7 -7,35 7,35" fill="#666666" />
+	</g>
+	<circle cx="472" cy="256" r="24" fill="#000000" />
+	<g transform="translate(402,256) rotate(45)">
+		<polygon points="7,7 35,7 35,-7 7,-7 7,-35 -7,-35 -7,-7
+			-35,-7 -35,7 -7,7 -7,35 7,35" fill="#666666" />
+	</g>
+</svg>
